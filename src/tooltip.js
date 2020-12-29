@@ -7,9 +7,10 @@ export function tooltip(node, options) {
 
 	function attachTooltip() {
 		component = new options.content({
-			target: node, 
+			target: options.target, 
 			props: { text: options.text, x: options.x, y: options.y }
 		})
+		console.log("X:Y ", options.x, options.y)
 	}
 	
 	function removeTooltip() {
@@ -18,8 +19,8 @@ export function tooltip(node, options) {
 
 	return {
 		destroy() {
-			node.removeEventListener('mouseover', attachTooltip);
-			node.removeEventListener('mouseout', removeTooltip);
+			node.removeEventListener('mouseenter', attachTooltip);
+			node.removeEventListener('mouseleave', removeTooltip);
 		}
 	};
 }

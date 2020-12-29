@@ -5,7 +5,6 @@
     import { getContext } from "svelte";
     import Annotations from "./components/Annotations.svelte";
     import App from "./App.svelte";
-    import App1 from "./App1.svelte";
     import { tooltip } from "./tooltip";
     import ToolTip from "./Tool.svelte";
 
@@ -25,7 +24,7 @@
                 .sort((a, b) => 1 / b.level - 1 / a.level)
         );
 
-    let circleData = pack(d3.group($data.slice(0, 5000), (d) => d.POS));
+    let circleData = pack(d3.group($data.slice(0, 50), (d) => d.POS));
 
     export let fill = "aqua";
 
@@ -155,36 +154,37 @@
     }
 
     .tooltip {
+        position: absolute;
         left: var(--left);
         top: var(--top);
-        position: absolute;
     }
 </style>
 
-<Html pointerEvents={false}>
-    <h1 use:tooltip={{ content: ToolTip, text: 'changed' }}>DE Map</h1>
-    <h2 use:tooltip={{ content: ToolTip, text: 'changed' }} class="tooltip">
-        {toolTipText}
-    </h2>
+{#if toolTipDiv}
+    <Svg viewBox="0 0 {$width} {$height}">
+        <g>
+            {#each [...circleData] as d}
+                <!-- {console.log('D: ', d)} -->
+                <!-- {console.log('Coord: ', $xGet(d), $x(d), $yGet(d), $y(d), $rGet(d), $r(d))} -->
+                <g
+                    use:tooltip={{ content: ToolTip, target: toolTipDiv, text: d.data.de, x: d.x, y: d.y }}>
+                    <circle
+                        style="--color: {color(+d.data.level)}"
+                        cx={d.x}
+                        cy={d.y}
+                        r={d.r}
+                        class={d.parent ? (d.children ? 'POS' : 'leaf') : 'root'}
+                        on:mouseover={() => onMouseOver(d)} />
+                </g>
+            {/each}
+        </g>
+    </Svg>
+{/if}
+<Html pointerEvents={false} viewBox="0 0 {$width} {$height}">
+    <h1>DE Map</h1>
+    <h2>{toolTipText || 'all'}</h2>
+    <div bind:this={toolTipDiv} />
 </Html>
-<Svg viewBox="0 0 {$width} {$height}">
-    <g>
-        {#each [...circleData] as d}
-            <!-- {console.log('D: ', d)} -->
-            <!-- {console.log('Coord: ', $xGet(d), $x(d), $yGet(d), $y(d), $rGet(d), $r(d))} -->
-            <g
-                use:tooltip={{ content: ToolTip, text: 'changed', x: d.x, y: d.y }}>
-                <circle
-                    style="--color: {color(+d.data.level)}"
-                    cx={d.x}
-                    cy={d.y}
-                    r={d.r}
-                    class={d.parent ? (d.children ? 'POS' : 'leaf') : 'root'}
-                    on:mouseover={() => onMouseOver(d)} />
-            </g>
-        {/each}
-    </g>
-</Svg>
 
 <!-- <Svg viewBox="-{$width / 2} -{$width / 2} {$width} {$height}">
     <circle cx={0} cy={0} r={$width / 2} {fill} />
