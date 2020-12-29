@@ -1,5 +1,6 @@
 <script>
     export let text = "All";
+    export let english = "";
     export let x = 150;
     export let y = 100;
 </script>
@@ -12,18 +13,25 @@
         width: 120px;
         height: 50px;
         z-index: 9999;
-        background-color: rgb(211, 10, 10);
+        background-color: white;
+        padding: 3px;
+        border: 2px solid black;
+        border-radius: 5px;
+        box-shadow: 10px 10px 5px grey;
     }
 
     span {
-        color: yellow;
+        color: black;
         z-index: 99999;
+    }
+
+    .de {
+        font-size: 1.2rem;
+        color: blue;
     }
 </style>
 
-<div class="rect" style="--top:{y}px; --left:{x}px;"><span>{text}</span></div>
-<!-- <g transform="translate({x},{y})">
-    <rect />
-    <text>Hello there</text>
-    <text>lfjlsdjsdflj</text>
-</g> -->
+<div class="rect" style="--left:{x - 120}px; --top:{y - 50}px;">
+    <div class="de">{text}</div>
+    <div>{english}</div>
+</div>

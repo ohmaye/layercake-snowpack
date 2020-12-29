@@ -8,9 +8,8 @@ export function tooltip(node, options) {
 	function attachTooltip() {
 		component = new options.content({
 			target: options.target, 
-			props: { text: options.text, x: options.x, y: options.y }
+			props: { text: options.text, english: options.en, x: options.x, y: options.y }
 		})
-		console.log("X:Y ", options.x, options.y)
 	}
 	
 	function removeTooltip() {
