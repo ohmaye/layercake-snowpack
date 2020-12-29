@@ -1,12 +1,10 @@
 <script lang="ts">
     import * as d3 from "d3";
-    import { onMount } from "svelte";
     import { Svg, Html, ScaledSvg } from "layercake";
     import { getContext } from "svelte";
-    import Annotations from "./components/Annotations.svelte";
-    import App from "./App.svelte";
     import { tooltip } from "./tooltip";
     import ToolTip from "./Tool.svelte";
+    import Details from "./Details.svelte";
 
     const { data, width, height } = getContext("LayerCake");
 
@@ -15,8 +13,7 @@
 
     let toolTipDiv;
     let toolTipText;
-    const toolTipWidth = 150;
-    const toolTipHeight = 200;
+    let mouseEnterElement;
 
     const pack = (data) =>
         d3.pack().size([vWidth, vHeight]).padding(1)(
@@ -35,8 +32,9 @@
         .domain([1, 40, 80, 120, 160])
         .range(["white", "yellow", "blue", "brown", "black"]);
 
-    const onMouseOver = (d) => {
-        // console.log("Mouse Over: ", d);
+    const onMouseEnter = (d) => {
+        console.log("Mouse Over: ", d);
+        mouseEnterElement = d;
         if (!d.parent) {
             toolTipText = "All";
         } else if (!d.children) {
@@ -65,22 +63,6 @@
         stroke-width: 1px;
         stroke: black;
     }
-
-    .tooltip {
-        position: absolute;
-        display: grid;
-        grid-template-columns: 1fr 3fr;
-        grid-auto-rows: 1.5rem;
-        left: var(--left);
-        top: var(--top);
-        width: var(--width);
-        height: var(--height);
-        background-color: white;
-        padding: 3px;
-        border: 2px solid black;
-        border-radius: 5px;
-        box-shadow: 10px 10px 5px grey;
-    }
 </style>
 
 {#if toolTipDiv}
@@ -94,7 +76,7 @@
                     cy={d.y}
                     r={d.r}
                     class="leaf"
-                    on:mouseover={() => onMouseOver(d)} />
+                    on:mouseenter={() => onMouseEnter(d)} />
             {:else}
                 <circle
                     cx={d.x}
@@ -107,12 +89,7 @@
 {/if}
 <Html pointerEvents={false} viewBox="0 0 {$width} {$height}">
     <h1>DE Map</h1>
-    <div
-        class="tooltip"
-        style="--left:{$width - 10 - toolTipWidth}px; --top:{10}px; --width:{toolTipWidth}px; --height:{toolTipHeight}px">
-        <span>DE: </span><span>{toolTipText || 'all'}</span>
-        <span>EN: </span><span>English</span>
-    </div>
+    <Details data={mouseEnterElement?.data} />
     <div bind:this={toolTipDiv} />
 </Html>
 
