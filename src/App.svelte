@@ -1,6 +1,5 @@
 <script lang="ts">
     import { LayerCake, Svg, Html, ScaledSvg } from "layercake";
-    import * as d3 from "d3";
     import Circle from "./Circle.svelte";
     import { deData } from "./data/DE4000byFreq";
 </script>

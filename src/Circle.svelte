@@ -1,6 +1,6 @@
 <script lang="ts">
     import * as d3 from "d3";
-    import { Svg, Html, ScaledSvg } from "layercake";
+    import { Svg, Html } from "layercake";
     import { getContext } from "svelte";
     import { tooltip } from "./tooltip";
     import ToolTip from "./Tool.svelte";
@@ -12,9 +12,9 @@
     const vHeight = 1000;
 
     let toolTipDiv;
-    let toolTipText;
     let mouseEnterElement;
 
+    // Prepare data
     const pack = (data) =>
         d3.pack().size([vWidth, vHeight]).padding(1)(
             d3
@@ -25,24 +25,11 @@
 
     let circleData = pack(d3.group($data.slice(0, 5000), (d) => d.POS));
 
-    export let fill = "aqua";
-
+    // Create color scheme based on level bins
     const color = d3
         .scaleLinear()
         .domain([1, 40, 80, 120, 160])
         .range(["white", "yellow", "blue", "brown", "black"]);
-
-    const onMouseEnter = (d) => {
-        console.log("Mouse Over: ", d);
-        mouseEnterElement = d;
-        if (!d.parent) {
-            toolTipText = "All";
-        } else if (!d.children) {
-            toolTipText = d.data.de;
-        } else {
-            toolTipText = d.data[0];
-        }
-    };
 </script>
 
 <style>
@@ -76,20 +63,21 @@
                     cy={d.y}
                     r={d.r}
                     class="leaf"
-                    on:mouseenter={() => onMouseEnter(d)} />
+                    on:mouseenter={() => (mouseEnterElement = d)} />
             {:else}
                 <circle
                     cx={d.x}
                     cy={d.y}
                     r={d.r}
-                    class={d.parent ? 'POS' : 'root'} />
+                    class={d.parent ? 'POS' : 'root'}
+                    on:mouseenter={() => (mouseEnterElement = d)} />
             {/if}
         {/each}
     </Svg>
 {/if}
 <Html pointerEvents={false} viewBox="0 0 {$width} {$height}">
     <h1>DE Map</h1>
-    <Details data={mouseEnterElement?.data} />
+    <Details node={mouseEnterElement} />
     <div bind:this={toolTipDiv} />
 </Html>
 
