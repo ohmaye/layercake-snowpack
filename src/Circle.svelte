@@ -15,6 +15,8 @@
 
     let toolTipDiv;
     let toolTipText;
+    const toolTipWidth = 150;
+    const toolTipHeight = 200;
 
     const pack = (data) =>
         d3.pack().size([vWidth, vHeight]).padding(1)(
@@ -53,7 +55,7 @@
     }
 
     .POS {
-        fill: white;
+        fill: azure;
         stroke-width: 1px;
         stroke: lightblue;
     }
@@ -66,8 +68,18 @@
 
     .tooltip {
         position: absolute;
+        display: grid;
+        grid-template-columns: 1fr 3fr;
+        grid-auto-rows: 1.5rem;
         left: var(--left);
         top: var(--top);
+        width: var(--width);
+        height: var(--height);
+        background-color: white;
+        padding: 3px;
+        border: 2px solid black;
+        border-radius: 5px;
+        box-shadow: 10px 10px 5px grey;
     }
 </style>
 
@@ -95,7 +107,12 @@
 {/if}
 <Html pointerEvents={false} viewBox="0 0 {$width} {$height}">
     <h1>DE Map</h1>
-    <h2>{toolTipText || 'all'}</h2>
+    <div
+        class="tooltip"
+        style="--left:{$width - 10 - toolTipWidth}px; --top:{10}px; --width:{toolTipWidth}px; --height:{toolTipHeight}px">
+        <span>DE: </span><span>{toolTipText || 'all'}</span>
+        <span>EN: </span><span>English</span>
+    </div>
     <div bind:this={toolTipDiv} />
 </Html>
 
