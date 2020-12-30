@@ -2,34 +2,33 @@
     import * as d3 from "d3";
     import { Svg, Html } from "layercake";
     import { getContext } from "svelte";
-    import { tooltip } from "./tooltip";
-    import ToolTip from "./Tool.svelte";
+    import Tooltip from "./Tooltip.svelte";
     import Details from "./Details.svelte";
 
-    const { data, width, height } = getContext("LayerCake");
+    const { data, width, height, xGet, yGet, rGet } = getContext("LayerCake");
 
-    const vWidth = 1000;
-    const vHeight = 1000;
-
-    let toolTipDiv;
     let mouseEnterElement;
 
     // Prepare data
-    const pack = (data) =>
-        d3.pack().size([vWidth, vHeight]).padding(1)(
+    const pack = (data, width, height) =>
+        d3.pack().size([width, height]).padding(1)(
             d3
                 .hierarchy(data)
                 .sum((d) => 1 / d.level)
                 .sort((a, b) => 1 / b.level - 1 / a.level)
         );
 
-    let circleData = pack(d3.group($data.slice(0, 5000), (d) => d.POS));
+    $: circleData = pack(
+        d3.group($data.slice(0, 200), (d) => d.POS),
+        $width,
+        $height
+    );
 
     // Create color scheme based on level bins
     const color = d3
-        .scaleLinear()
+        .scaleSequential()
         .domain([1, 40, 80, 120, 160])
-        .range(["white", "yellow", "blue", "brown", "black"]);
+        .range([d3.interpolateYlGnBu(0), d3.interpolateYlGnBu(0.8)]);
 </script>
 
 <style>
@@ -50,35 +49,44 @@
         stroke-width: 1px;
         stroke: black;
     }
+
+    .POSLabel {
+        position: absolute;
+        left: var(--left);
+        top: var(--top);
+        background-color: white;
+        border-radius: 30px;
+        font-size: 1.5rem;
+        padding: 10px;
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2),
+            0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
 </style>
 
-{#if toolTipDiv}
-    <Svg viewBox="0 0 {$width} {$height}">
-        {#each [...circleData] as d}
-            {#if d.parent && !d.children}
-                <circle
-                    use:tooltip={{ content: ToolTip, target: toolTipDiv, text: d.data.de, en: d.data.en, x: d.x, y: d.y }}
-                    style="--color: {color(+d.data.level)}"
-                    cx={d.x}
-                    cy={d.y}
-                    r={d.r}
-                    class="leaf"
-                    on:mouseenter={() => (mouseEnterElement = d)} />
-            {:else}
-                <circle
-                    cx={d.x}
-                    cy={d.y}
-                    r={d.r}
-                    class={d.parent ? 'POS' : 'root'}
-                    on:mouseenter={() => (mouseEnterElement = d)} />
-            {/if}
-        {/each}
-    </Svg>
-{/if}
+<Svg viewBox="0 0 {$width} {$height}">
+    {#each [...circleData] as d}
+        <circle
+            style="--color: {color(+d.data.level)}"
+            cx={d.x}
+            cy={d.y}
+            r={d.r}
+            class={!d.parent ? 'root' : d.children ? 'POS' : 'leaf'}
+            on:mouseenter={() => (mouseEnterElement = d)} />
+    {/each}
+</Svg>
 <Html pointerEvents={false} viewBox="0 0 {$width} {$height}">
     <h1>DE Map</h1>
     <Details node={mouseEnterElement} />
-    <div bind:this={toolTipDiv} />
+    {#each [...circleData] as d}
+        {#if d?.parent && d?.children && d?.r > 50}
+            <div
+                class="POSLabel"
+                style="--left:{d.x - 20}px; --top:{d.y - 20}px;">
+                {d.data[0]}
+            </div>
+        {/if}
+    {/each}
+    <Tooltip node={mouseEnterElement} />
 </Html>
 
 <!-- onMount(() => {
