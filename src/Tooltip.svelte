@@ -1,4 +1,9 @@
 <script>
+    import type { dataset_dev } from "svelte/internal";
+    import { fade, slide } from "svelte/transition";
+    import { flip } from "svelte/animate";
+    import { quintOut } from "svelte/easing";
+
     export let node;
 
     const setData = (node) => {
@@ -37,7 +42,12 @@
     }
 </style>
 
-<div class="rect" style="--left:{node?.x - 120}px; --top:{node?.y - 50}px;">
-    <div class="de">{data.de || ''}</div>
-    <div>{data.en || ''}</div>
-</div>
+{#if data.de != 'All'}
+    <div
+        transition:slide
+        class="rect"
+        style="--left:{node?.x - 120}px; --top:{node?.y - 50}px;">
+        <div class="de">{data.de || ''}</div>
+        <div>{data.en || ''}</div>
+    </div>
+{/if}

@@ -1,5 +1,5 @@
 <script lang="ts">
-    import { LayerCake, Svg, Html, ScaledSvg } from "layercake";
+    import { LayerCake } from "layercake";
     import Circle from "./Circle.svelte";
     import { deData } from "./data/DE4000byFreq";
 </script>

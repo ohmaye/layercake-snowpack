@@ -1,5 +1,6 @@
 <script>
     import { getContext } from "svelte";
+
     const { width, height } = getContext("LayerCake");
 
     export let node;
